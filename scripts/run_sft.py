@@ -100,8 +100,8 @@ def main():
     from datasets import DatasetDict
     indices = range(0, 100)
 
-    dataset_dict = {"train": raw_datasets["train_sft"].select(indices),
-                    "test": raw_datasets["test_sft"].select(indices)}
+    dataset_dict = {"train": raw_datasets["train"].select(indices),
+                    "test": raw_datasets["test"].select(indices)}
     raw_datasets = DatasetDict(dataset_dict)
 
     ################
