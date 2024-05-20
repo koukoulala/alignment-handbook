@@ -25,6 +25,7 @@ import datasets
 import torch
 import transformers
 from transformers import AutoModelForCausalLM, set_seed
+import json
 
 from alignment import (
     DataArguments,
@@ -76,11 +77,6 @@ def main():
     logger.info(f"Model parameters {model_args}")
     logger.info(f"Data parameters {data_args}")
     logger.info(f"Training/evaluation parameters {training_args}")
-
-    # Check for last checkpoint
-    last_checkpoint = get_checkpoint(training_args)
-    if last_checkpoint is not None and training_args.resume_from_checkpoint is None:
-        logger.info(f"Checkpoint detected, resuming training at {last_checkpoint=}.")
 
     ###############
     # Load datasets
@@ -229,6 +225,24 @@ def main():
         metrics["eval_samples"] = len(eval_dataset)
         trainer.log_metrics("eval", metrics)
         trainer.save_metrics("eval", metrics)
+
+    ##########
+    # Inference and Save Responses
+    ##########
+    logger.info("*** Inference and Save Responses ***")
+    responses = []
+    model.eval()
+    for example in eval_dataset:
+        inputs = tokenizer(example["prompt"], return_tensors="pt").to(training_args.device)
+        with torch.no_grad():
+            outputs = model.generate(**inputs, max_length=training_args.generation_max_length)
+        response = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        responses.append({"prompt": example["prompt"], "response": response})
+
+    output_file = f"{training_args.output_dir}/responses.json"
+    with open(output_file, "w", encoding="utf-8") as f:
+        json.dump(responses, f, ensure_ascii=False, indent=4)
+    logger.info(f"Responses saved to {output_file}")
 
     if training_args.push_to_hub is True:
         logger.info("Pushing to hub...")
