@@ -3,7 +3,7 @@ model_name_or_path: ./ckpts/Mixtral-8x7B-Instruct-v0.1
 #model_name_or_path: ./ckpts/Mistral-7B-Instruct-v0.2
 model_revision: main
 torch_dtype: bfloat16
-use_flash_attention_2: false
+use_flash_attention_2: true
 
 # LoRA arguments
 load_in_4bit: true
@@ -23,10 +23,10 @@ lora_target_modules:
 # Data training arguments
 chat_template: "{% for message in messages %}\n{% if message['role'] == 'user' %}\n{{ '<|user|>\n' + message['content'] + eos_token }}\n{% elif message['role'] == 'system' %}\n{{ '<|system|>\n' + message['content'] + eos_token }}\n{% elif message['role'] == 'assistant' %}\n{{ '<|assistant|>\n'  + message['content'] + eos_token }}\n{% endif %}\n{% if loop.last and add_generation_prompt %}\n{{ '<|assistant|>' }}\n{% endif %}\n{% endfor %}"
 dataset_mixer:
-  HuggingFaceH4/ultrachat_200k: 1.0
+  ./data/AssetGeneration/: 1.0
 dataset_splits:
-- train_sft
-- test_sft
+- train_sft.tsv
+- test_sft.tsv
 preprocessing_num_workers: 12
 
 # SFT trainer config
@@ -44,18 +44,18 @@ log_level: info
 logging_steps: 5  
 logging_strategy: steps
 lr_scheduler_type: cosine
-max_seq_length: 2048
+max_seq_length: 1024
 max_steps: -1
 num_train_epochs: 1
 output_dir: output/asset-generation-sft-qlora
 overwrite_output_dir: true
-per_device_eval_batch_size: 8
-per_device_train_batch_size: 4
+per_device_eval_batch_size: 16
+per_device_train_batch_size: 8
 push_to_hub: false
 report_to:
 - tensorboard
 save_strategy: "steps"
-save_steps: 100
+save_steps: 500
 save_total_limit: 1
 seed: 42
 warmup_ratio: 0.1
