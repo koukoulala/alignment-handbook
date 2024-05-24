@@ -99,13 +99,14 @@ def main():
     logger.info(f"Columns: {column_names}")
 
     # remove this when done debugging
+    '''
     from datasets import DatasetDict
     indices = range(0, 100)
 
     dataset_dict = {"train": raw_datasets["train"].select(indices),
                     "test": raw_datasets["test"].select(indices)}
     raw_datasets = DatasetDict(dataset_dict)
-
+    '''
     ################
     # Load tokenizer
     ################
