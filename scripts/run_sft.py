@@ -126,14 +126,14 @@ def main():
     column_names = list(raw_datasets["train"].features)
 
     # remove this when done debugging
-    '''
+    
     from datasets import DatasetDict
     indices = range(0, 100)
 
     dataset_dict = {"train": raw_datasets["train"].select(indices),
                     "test": raw_datasets["test"].select(indices)}
     raw_datasets = DatasetDict(dataset_dict)
-    '''
+
     ################
     # Load tokenizer
     ################
