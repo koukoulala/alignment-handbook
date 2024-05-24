@@ -25,8 +25,8 @@ chat_template: "{% for message in messages %}\n{% if message['role'] == 'user' %
 dataset_mixer:
   ./data/AssetGeneration/: 1.0
 dataset_splits:
-- train_sft
-- test_sft
+- train
+- test
 preprocessing_num_workers: 12
 
 # SFT trainer config
