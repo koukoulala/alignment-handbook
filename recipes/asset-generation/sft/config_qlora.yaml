@@ -46,11 +46,11 @@ logging_strategy: steps
 lr_scheduler_type: cosine
 max_seq_length: 1024
 max_steps: -1
-num_train_epochs: 1
+num_train_epochs: 2
 output_dir: output/asset-generation-sft-qlora
 overwrite_output_dir: true
-per_device_eval_batch_size: 16
-per_device_train_batch_size: 8
+per_device_eval_batch_size: 32
+per_device_train_batch_size: 16
 push_to_hub: false
 report_to:
 - tensorboard
