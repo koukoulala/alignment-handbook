@@ -4,6 +4,9 @@ import argparse
 import re
 import random
 from collections import Counter
+import pandas as pd
+import pyarrow.parquet as pq
+import pyarrow as pa
 
 def reshape_category(CategoryName):
     if CategoryName == "":
@@ -28,7 +31,6 @@ def construct_message(user_prompt_template, detail_info, Asset_list, data_idx, A
         assistant_content += "Ad:" + asset + "\n"
     assistant_message = {"content": assistant_content, "role": "assistant"}
     message = {"prompt_id": str(data_idx), "messages": [user_message, assistant_message]}
-    message = json.dumps(message, ensure_ascii=False)
 
     return message
 
@@ -167,19 +169,35 @@ def main(args):
     fw_test = open(args.test, 'w', encoding='utf-8')
 
     for row in full_data_list:
+        row = json.dumps(row, ensure_ascii=False)
         fw_full.write(row + "\n")
 
     for row in train_data:
+        row = json.dumps(row, ensure_ascii=False)
         fw_train.write(row + "\n")
 
     for row in test_data:
+        row = json.dumps(row, ensure_ascii=False)
         fw_test.write(row + "\n")
 
     fw_full.close()
     fw_train.close()
     fw_test.close()
 
+    # Output to parquet
+    df_train = pd.DataFrame(train_data)
+    df_test = pd.DataFrame(test_data)
+    df_train.to_parquet(args.train.replace(".tsv", ".parquet"))
+    df_test.to_parquet(args.test.replace(".tsv", ".parquet"))
+
+
     print("Data generation is done.")
+
+def ConvertCsvToParquet(input_file, output_file):
+    df = pd.read_csv(input_file, sep='\t')
+    table = pa.Table.from_pandas(df)
+    pq.write_table(table, output_file)
+    print("Conversion is done.")
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GenerateTrainTestDataForLLM')
@@ -190,4 +208,6 @@ if __name__ == '__main__':
     parser.add_argument('-te', '--test', help='tsv file', default="../data/AssetGeneration/test_sft.tsv")
     args = parser.parse_args()
     main(args)
+    #ConvertCsvToParquet(args.train, args.train.replace(".tsv", ".parquet"))
+    #ConvertCsvToParquet(args.test, args.test.replace(".tsv", ".parquet"))
 

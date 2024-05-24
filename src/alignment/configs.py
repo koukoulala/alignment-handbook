@@ -232,6 +232,10 @@ class DataArguments:
             )
         },
     )
+    input_test_file: Optional[str] = field(
+        default="",
+        metadata={"help": "The input file for test."},
+    )
 
 
 @dataclass

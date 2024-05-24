@@ -22,7 +22,7 @@ import random
 import sys
 
 import datasets
-from datasets import load_metric
+from datasets import load_metric, load_dataset
 import torch
 import transformers
 from transformers import AutoModelForCausalLM, set_seed
@@ -46,35 +46,6 @@ from trl import SFTTrainer, setup_chat_format
 
 logger = logging.getLogger(__name__)
 
-'''
-def compute_metrics(eval_preds):
-    preds, labels = eval_preds
-    decoded_preds = tokenizer.batch_decode(preds, skip_special_tokens=True)
-    decoded_labels = tokenizer.batch_decode(labels, skip_special_tokens=True)
-
-    # 去掉前后的空格
-    decoded_preds = [pred.strip() for pred in decoded_preds]
-    decoded_labels = [label.strip() for label in decoded_labels]
-
-    # 加载 BLEU 和 ROUGE 度量
-    bleu_metric = load_metric("bleu")
-    rouge_metric = load_metric("rouge")
-
-    # 计算 BLEU
-    bleu_score = bleu_metric.compute(predictions=decoded_preds, references=[[label] for label in decoded_labels])
-
-    # 计算 ROUGE
-    rouge_score = rouge_metric.compute(predictions=decoded_preds, references=decoded_labels)
-
-    # 返回结果
-    return {
-        "bleu": bleu_score['bleu'],
-        "rouge1": rouge_score['rouge1'].mid.fmeasure,
-        "rouge2": rouge_score['rouge2'].mid.fmeasure,
-        "rougeL": rouge_score['rougeL'].mid.fmeasure,
-        "rougeLsum": rouge_score['rougeLsum'].mid.fmeasure,
-    }
-'''
 def main():
     parser = H4ArgumentParser((ModelArguments, DataArguments, SFTConfig))
     model_args, data_args, training_args = parser.parse()
@@ -114,16 +85,18 @@ def main():
     ###############
     # Load datasets
     ###############
+    logger.info(f"dataset_splits: {data_args.dataset_splits}")
     raw_datasets = get_datasets(
         data_args,
         splits=data_args.dataset_splits,
         configs=data_args.dataset_configs,
-        columns_to_keep=["messages", "chosen", "rejected", "prompt", "completion", "label"],
+        columns_to_keep=["messages", "prompt_id"],
     )
     logger.info(
         f"Training on the following datasets and their proportions: {[split + ' : ' + str(dset.num_rows) for split, dset in raw_datasets.items()]}"
     )
     column_names = list(raw_datasets["train"].features)
+    logger.info(f"Columns: {column_names}")
 
     # remove this when done debugging
     from datasets import DatasetDict
