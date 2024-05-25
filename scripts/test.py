@@ -1,6 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-checkpoint = "../ckpts/"
+checkpoint = "../ckpts/Mistral-7B-Instruct-v0.2/"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 model = AutoModelForCausalLM.from_pretrained(checkpoint)  # You may want to use bfloat16 and/or move to GPU here
 
