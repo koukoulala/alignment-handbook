@@ -183,6 +183,8 @@ def main():
     trainer.save_state()
 
     # Save everything else on main process
+    trainer.model.config.use_cache = True
+    trainer.model.config.save_pretrained(training_args.output_dir)
 
     if training_args.push_to_hub is True:
         logger.info("Pushing to hub...")
