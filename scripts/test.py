@@ -9,7 +9,7 @@ quantization_config = BitsAndBytesConfig(
 )
 
 checkpoint = "../ckpts/Mistral-7B-Instruct-v0.2/"
-model = AutoModelForCausalLM.from_pretrained(checkpoint, quantization_config=True, device_map="auto")
+model = AutoModelForCausalLM.from_pretrained(checkpoint, quantization_config=quantization_config, device_map="auto")
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
 
 messages = [
