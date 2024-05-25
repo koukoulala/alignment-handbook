@@ -193,21 +193,24 @@ def main(args):
 
     print("Data generation is done.")
 
-def ConvertCsvToParquet(input_file, output_file):
-    df = pd.read_csv(input_file, sep='\t')
-    table = pa.Table.from_pandas(df)
-    pq.write_table(table, output_file)
-    print("Conversion is done.")
+def ConvertTestToInferenceData(input_file, output_dir):
+    df = pd.read_parquet(input_file)
+    print(df.head())
+    print(df.columns)
+    print(df.shape)
+
+    out_prompt_file = os.path.join(output_dir, "inference_prompt.tsv")
+    out_response_file = os.path.join(output_dir, "inference_response.tsv")
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GenerateTrainTestDataForLLM')
     parser.add_argument('-i', '--input', help='input file', default="../data/AssetGeneration/OriginalCombinedAssets.tsv")
     #parser.add_argument('-i', '--input', help='input file', default="../data/AssetGeneration/test.tsv")
     parser.add_argument('-fu', '--FullData', help='tsv file', default="../data/AssetGeneration/FullData.tsv")
-    parser.add_argument('-tr', '--train', help='tsv file', default="../data/AssetGeneration/train_sft.tsv")
-    parser.add_argument('-te', '--test', help='tsv file', default="../data/AssetGeneration/test_sft.tsv")
+    parser.add_argument('-tr', '--train', help='tsv file', default="../data/AssetGeneration/train.tsv")
+    parser.add_argument('-te', '--test', help='tsv file', default="../data/AssetGeneration/test.tsv")
     args = parser.parse_args()
-    main(args)
-    #ConvertCsvToParquet(args.train, args.train.replace(".tsv", ".parquet"))
-    #ConvertCsvToParquet(args.test, args.test.replace(".tsv", ".parquet"))
+    #main(args)
+    ConvertTestToInferenceData(args.test.replace(".tsv", ".parquet"), "../data/AssetGeneration/")
 
