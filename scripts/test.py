@@ -1,5 +1,5 @@
 import torch
-from peft import PeftModel, PeftTokenizer
+from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 # specify how to quantize the model
