@@ -202,6 +202,26 @@ def ConvertTestToInferenceData(input_file, output_dir):
     out_prompt_file = os.path.join(output_dir, "inference_prompt.tsv")
     out_response_file = os.path.join(output_dir, "inference_response.tsv")
 
+    fw_prompt = open(out_prompt_file, 'w', encoding='utf-8')
+    fw_response = open(out_response_file, 'w', encoding='utf-8')
+
+    for index, row in df.iterrows():
+        prompt_id = row['prompt_id']
+        message = row['messages']
+        for me_json in message:
+            if me_json['role'] == "user":
+                user_prompt = me_json['content']
+                prompt_json = {"prompt_id": prompt_id, "prompt": user_prompt}
+                fw_prompt.write(json.dumps(prompt_json, ensure_ascii=False) + "\n")
+            elif me_json['role'] == "assistant":
+                assistant_response = me_json['content']
+                response_json = {"prompt_id": prompt_id, "response": assistant_response}
+                fw_response.write(json.dumps(response_json, ensure_ascii=False) + "\n")
+
+    fw_prompt.close()
+    fw_response.close()
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='GenerateTrainTestDataForLLM')
