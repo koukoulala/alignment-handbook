@@ -79,7 +79,7 @@ def main():
 
     # Check for last checkpoint
     last_checkpoint = get_checkpoint(training_args)
-    if last_checkpoint is not None and training_args.resume_from_checkpoint is None:
+    if last_checkpoint is not None:
         logger.info(f"Checkpoint detected, resuming training at {last_checkpoint=}.")
 
     ###############
@@ -194,9 +194,7 @@ def main():
     ###############
     logger.info("*** Train ***")
     checkpoint = None
-    if training_args.resume_from_checkpoint is not None:
-        checkpoint = training_args.resume_from_checkpoint
-    elif last_checkpoint is not None:
+    if last_checkpoint is not None:
         checkpoint = last_checkpoint
     train_result = trainer.train(resume_from_checkpoint=checkpoint)
     metrics = train_result.metrics
@@ -214,8 +212,6 @@ def main():
 
     # Save everything else on main process
     kwargs = {
-        "finetuned_from": model_args.model_name_or_path,
-        "dataset": list(data_args.dataset_mixer.keys()),
         "dataset_tags": list(data_args.dataset_mixer.keys()),
         "tags": ["alignment-handbook"],
     }
