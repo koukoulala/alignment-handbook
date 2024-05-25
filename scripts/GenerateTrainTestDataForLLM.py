@@ -210,12 +210,11 @@ def ConvertTestToInferenceData(input_file, output_dir):
         message = row['messages']
         for me_json in message:
             if me_json['role'] == "user":
-                user_prompt = me_json['content']
-                prompt_json = {"prompt_id": prompt_id, "prompt": user_prompt}
+                prompt_json = {"prompt_id": prompt_id, "prompt": [me_json]}
                 fw_prompt.write(json.dumps(prompt_json, ensure_ascii=False) + "\n")
             elif me_json['role'] == "assistant":
                 assistant_response = me_json['content']
-                response_json = {"prompt_id": prompt_id, "response": assistant_response}
+                response_json = {"prompt_id": prompt_id, "response": [me_json]}
                 fw_response.write(json.dumps(response_json, ensure_ascii=False) + "\n")
 
     fw_prompt.close()
